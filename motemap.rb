@@ -13,7 +13,12 @@ class MoteMap < Sinatra::Base
   end
 
   before do
-    @conn = PG::Connection.open([:dbname, :host, :user].to_h {|v| settings.config.get_value(v.to_s).to_s})
+    args = [:dbname, :host, :user].to_h {|v| settings.config.get_value(v.to_s).to_s}
+    begin
+      @conn = PG::Connection.open(args)
+    rescue PG::Error => err
+      return {:error => "no database connection available", :detail => err.to_s}
+    end
   end
 
   after do

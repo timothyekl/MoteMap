@@ -14,4 +14,13 @@ class MoteMap
     end
   end
 
+  get '/api/node/:nid/data' do
+    res = @conn.exec("SELECT * FROM xbw_da100_results WHERE nodeid=$1 ORDER BY result_time DESC LIMIT 1", [params[:nid].to_i])
+    if res.num_tuples != 1
+      return {:error => "unexpected number of tuples: #{res.num_tuples}"}.to_json
+    else
+      return res[0].to_json
+    end
+  end
+
 end
