@@ -14,6 +14,7 @@ class MoteMap < Sinatra::Base
 
   before do
     args = [:dbname, :host, :user].to_h {|v| settings.config.get_value(v.to_s).to_s}
+    args[:connect_timeout] = 1
     begin
       @conn = PG::Connection.open(args)
     rescue PG::Error => err
@@ -22,7 +23,7 @@ class MoteMap < Sinatra::Base
   end
 
   after do
-    @conn.close
+    @conn.close if !@conn.nil?
   end
 
   get '/' do
