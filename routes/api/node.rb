@@ -35,7 +35,9 @@ class MoteMap
   end
 
   get '/api/node/:nid/data/?:field?' do
-    return node_data(params[:nid].to_i, params[:field]).to_json
+    data = node_data(params[:nid].to_i, params[:field])
+    return data.to_i.to_json if data.respond_to? :to_i and data.to_i.to_s == data
+    return data.to_json
   end
 
 end
