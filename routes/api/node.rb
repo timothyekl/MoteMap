@@ -3,7 +3,7 @@ class MoteMap
   helpers do
     def node_list
       res = @conn.exec("SELECT DISTINCT ON (nodeid) * FROM node_health ORDER BY nodeid, result_time DESC")
-      return res.map{|t| t['nodeid']}
+      return res.map{|t| t['nodeid']}.map{|t| t.to_i.to_s == t ? t.to_i : t}
     end
 
     def node_info(node_id, table, limit = 1)
@@ -28,6 +28,13 @@ class MoteMap
 
   get '/api/nodes' do
     return self.node_list.to_json
+  end
+
+  get '/api/node/:nid' do
+    if self.node_list.include? params[:nid].to_i
+      return ["health", "data"].to_json
+    end
+    return {:error => "Unknown node ID #{params[:nid]}"}.to_json
   end
 
   get '/api/node/:nid/health' do
