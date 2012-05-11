@@ -34,7 +34,7 @@ function createNodes(idList) {
         $.ajax("/api/node/" + elem + "/data", {
             dataType: "json",
             error: function(jqxhr, textStatus, errorThrown) {
-                displayError("Failed to get temperature data for node " + elem + " (" + textStatus + ")");
+                displayError("Failed to get data for node " + elem + " (" + textStatus + ")");
             },
             success: function(data, textStatus, jqxhr) {
                 var temp = parseInt(data["temp"]);
@@ -79,7 +79,7 @@ function colorTemperatureFromADC(nodeid, adc) {
  * Light values are interpreted linearly from 0 to 1023, and shade HTML yellow with black as appropriate.
  */
 function colorLightFromADC(nodeid, adc) {
-    var lightColor = (Math.floor((adc / 1023) * 255)).toString(16);
+    var lightColor = zero_pad((Math.floor((adc / 1023) * 255)).toString(16), 2);
     $(".node#node-" + nodeid + " .light").css("background-color", "#" + lightColor + lightColor + "00");
 }
 

@@ -1,0 +1,10 @@
+!!!
+
+%html
+  %head
+    %title Upload Background
+  %body
+    %form{:method => "POST", :action => "/background/set", :enctype => "multipart/form-data"}
+      PNG file: 
+      %input{:type => "file", :name => "background", :chars => 40}
+      %input{:type => "submit", :name => "submit", :value => "Submit"}
