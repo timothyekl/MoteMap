@@ -24,6 +24,20 @@ class MoteMap
       res = self.node_info(node_id, "xbw_da100_results")
       return field.nil? ? res : res[field]
     end
+
+    def node_metadata(node_id, field = nil)
+      res = Metadata.first_or_create(:id => node_id)
+      return {:error => "No metadata for node: #{node_id}"} if res.nil?
+      
+      if !field.nil?
+        return res.send(field.to_s) if res.respond_to? field.to_s
+        return {:error => "Metadata does not store field: #{field}"}
+      end
+
+      params = [:x, :y]
+      return params.to_h {|s| res.send(s)}
+    end
+
   end
 
   get '/api/config' do
@@ -49,6 +63,10 @@ class MoteMap
     data = node_data(params[:nid].to_i, params[:field])
     return data.to_i.to_json if data.respond_to? :to_i and data.to_i.to_s == data
     return data.to_json
+  end
+
+  get '/api/node/:nid/metadata/?:field?' do
+    return node_metadata(params[:nid].to_i, params[:field]).to_json
   end
 
 end
