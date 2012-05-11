@@ -10,11 +10,22 @@ function displayError(text) {
 }
 
 /**
+ * Generate the HTML snippet for a new node div with the given ID.
+ */
+function nodeDivHTML(nodeid) {
+    result = "<div class='node' id-'node-'" + nodeid + "'>";
+    result += "<div class='temp'>&nbsp;</div>";
+    result += "<div class='light'>&nbsp;</div>";
+    result += nodeid + "</div>";
+    return result;
+}
+
+/**
  * Create a collection of node divs in the page, one for each node ID in the argument.
  */
 function createNodes(idList) {
     $.each(idList, function(idx, elem) {
-        $("#content").append("<div class='node' id='node-" + elem + "'>" + elem + "</div>");
+        $("#content").append(nodeDivHTML(elem));
     });
 
     $(".node").draggable();
