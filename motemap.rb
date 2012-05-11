@@ -1,7 +1,9 @@
+require 'haml'
 require 'json'
 require 'parseconfig'
 require 'pg'
 require 'pp'
+require 'sass'
 require 'sinatra/base'
 
 require './helpers.rb'
