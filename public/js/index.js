@@ -13,7 +13,7 @@ function displayError(text) {
  * Generate the HTML snippet for a new node div with the given ID.
  */
 function nodeDivHTML(nodeid) {
-    result = "<div class='node' id-'node-'" + nodeid + "'>";
+    result = "<div class='node' id='node-" + nodeid + "'>";
     result += "<div class='temp'>&nbsp;</div>";
     result += "<div class='light'>&nbsp;</div>";
     result += nodeid + "</div>";
@@ -31,13 +31,14 @@ function createNodes(idList) {
     $(".node").draggable();
 
     $.each(idList, function(idx, elem) {
-        $.ajax("/api/node/" + elem + "/data/temp", {
+        $.ajax("/api/node/" + elem + "/data", {
             dataType: "json",
             error: function(jqxhr, textStatus, errorThrown) {
                 displayError("Failed to get temperature data for node " + elem + " (" + textStatus + ")");
             },
             success: function(data, textStatus, jqxhr) {
-                colorTemperatureFromADC(elem, data);
+                colorTemperatureFromADC(elem, parseInt(data["temp"]));
+                colorLightFromADC(elem, parseInt(data["light"]));
             }
         });
     });
@@ -49,7 +50,16 @@ function createNodes(idList) {
 function colorTemperatureFromADC(nodeid, adc) {
     var temp = adc_to_celsius(adc);
     // TODO this should show temperature by color, not tooltip
-    $(".node#node-" + nodeid).attr("title", temp + "C");
+}
+
+function colorLightFromADC(nodeid, adc) {
+    var lightColor = (Math.floor((adc / 1023) * 255)).toString(16);
+    $(".node#node-" + nodeid + " .light").css("background-color", "#" + lightColor + lightColor + "00");
+}
+
+function setTooltipFromTemperatureLightADC(nodeid, temp_adc, light_adc) {
+    var temp = adc_to_celsius(temp_adc);
+    $(".node#node-" + nodeid).attr("title", temp + "C\n" + (light_adc / 1023) * 100 + "% light");
 }
 
 // Ready!
