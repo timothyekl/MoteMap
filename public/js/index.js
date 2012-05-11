@@ -25,7 +25,7 @@ function nodeDivHTML(nodeid) {
  */
 function createNodes(idList) {
     $.each(idList, function(idx, elem) {
-        $("#content").append(nodeDivHTML(elem));
+        $("body").append(nodeDivHTML(elem));
     });
 
     $(".node").draggable();
