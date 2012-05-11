@@ -45,6 +45,51 @@ function createNodes(idList) {
             }
         });
     });
+
+    updatePositionsFromMetadata();
+}
+
+/**
+ * Fetch the last known position of the given node from server metadata
+ * and update its absolute position on the page to match.
+ */
+function updatePositionsFromMetadata() {
+    $.ajax("/api/nodes/metadata", {
+        dataType: "json",
+        error: function(jqxhr, textStatus, errorThrown) {
+            displayError("Could not retrieve metadata");
+        },
+        success: function(data, textStatus, jqxhr) {
+            if(typeof(data["error"]) != "undefined") {
+                displayError("Server returned error when fetching metadata for node " + nodeid);
+                return;
+            }
+            
+            for(var nodeid in data) {
+                nodedata = data[nodeid];
+                if(typeof(nodedata["x"]) != "undefined") {
+                    var xpos = parseInt(nodedata["x"]);
+                    if(xpos != -1) {
+                        $(".node#node-" + nodeid).css("left", xpos + "px");
+                    }
+                }
+
+                if(typeof(nodedata["y"]) != "undefined") {
+                    var ypos = parseInt(nodedata["y"]);
+                    if(ypos != -1) {
+                        $(".node#node-" + nodeid).css("top", ypos + "px");
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Set the last known position of the given node in server metadata.
+ */
+function setLastPosition(nodeid, x, y) {
+    // TODO
 }
 
 /**

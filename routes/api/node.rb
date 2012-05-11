@@ -30,6 +30,7 @@ class MoteMap
     def node_metadata(node_id, field = nil)
       res = Metadata.first_or_create(:id => node_id)
       return {:error => "No metadata for node: #{node_id}"} if res.nil?
+      res.save
       
       if !field.nil?
         return res.send(field.to_s) if res.respond_to? field.to_s
