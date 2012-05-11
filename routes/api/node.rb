@@ -26,6 +26,10 @@ class MoteMap
     end
   end
 
+  get '/api/config' do
+    settings.config.params.to_json
+  end
+
   get '/api/nodes' do
     return self.node_list.to_json
   end

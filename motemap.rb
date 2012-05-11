@@ -26,14 +26,6 @@ class MoteMap < Sinatra::Base
     @conn.close if !@conn.nil?
   end
 
-  get '/' do
-    "Hello world"
-  end
-
-  get '/config' do
-    settings.config.params.to_json
-  end
-
   Dir['./routes/**/*.rb'].each {|f| require f}
 
   run! if app_file == $0
