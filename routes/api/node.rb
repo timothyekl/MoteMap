@@ -22,7 +22,9 @@ class MoteMap
 
     def node_data(node_id, field = nil)
       res = self.node_info(node_id, "xbw_da100_results")
-      return field.nil? ? res : res[field]
+      res = field.nil? ? res : res[field]
+      return res.to_i if res.respond_to? :to_i and res.to_i.to_s == res
+      return res
     end
 
     def node_metadata(node_id, field = nil)
@@ -59,14 +61,24 @@ class MoteMap
     return node_health(params[:nid].to_i).to_json
   end
 
+  get '/api/nodes/health' do
+    return node_list.to_h {|nid| node_health(nid)}.to_json
+  end
+
   get '/api/node/:nid/data/?:field?' do
-    data = node_data(params[:nid].to_i, params[:field])
-    return data.to_i.to_json if data.respond_to? :to_i and data.to_i.to_s == data
-    return data.to_json
+    return node_data(params[:nid].to_i, params[:field]).to_json
+  end
+
+  get '/api/nodes/data/?:field?' do
+    return node_list.to_h {|nid| node_data(nid, params[:field])}.to_json
   end
 
   get '/api/node/:nid/metadata/?:field?' do
     return node_metadata(params[:nid].to_i, params[:field]).to_json
+  end
+
+  get '/api/nodes/metadata/?:field?' do
+    return node_list.to_h {|nid| node_metadata(nid, params[:field])}.to_json
   end
 
 end
