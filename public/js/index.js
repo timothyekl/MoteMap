@@ -36,9 +36,11 @@ function createNodes() {
 
                 // Make the node draggable
                 $(".node#node-" + nodeid).draggable({
-                    stop: function(event, ui) {
-                        setLastPosition(nodeid, event.pageX, event.pageY);
-                    }
+                    stop: function(n) {
+                        return function(event, ui) {
+                            setLastPosition(n, event.pageX, event.pageY);
+                        }
+                    }(nodeid)
                 });
 
                 // Populate the visual data for the node
@@ -78,14 +80,16 @@ function updatePositionsFromMetadata() {
                 if(typeof(nodedata["x"]) != "undefined") {
                     var xpos = parseInt(nodedata["x"]);
                     if(xpos != -1) {
-                        $(".node#node-" + nodeid).css("left", xpos + "px");
+                        var e = $(".node#node-" + nodeid).first();
+                        e.css("left", (xpos - e.offset().left) + "px");
                     }
                 }
 
                 if(typeof(nodedata["y"]) != "undefined") {
                     var ypos = parseInt(nodedata["y"]);
                     if(ypos != -1) {
-                        $(".node#node-" + nodeid).css("top", ypos + "px");
+                        var e = $(".node#node-" + nodeid).first();
+                        e.css("top", (ypos - e.offset().top) + "px");
                     }
                 }
             }
@@ -97,7 +101,19 @@ function updatePositionsFromMetadata() {
  * Set the last known position of the given node in server metadata.
  */
 function setLastPosition(nodeid, x, y) {
-    // TODO
+    $.ajax("/api/node/" + nodeid + "/metadata", {
+        data: {x: x, y: y},
+        dataType: "json",
+        error: function(jqxhr, textStatus, errorThrown) {
+            displayError("Could not set metadata for node " + nodeid + " (" + textStatus + ")");
+        },
+        success: function(data, textStatus, jqxhr) {
+            if(typeof(data["error"]) != "undefined") {
+                displayError("Server returned error setting metadata: " + data["error"]);
+            }
+        },
+        type: "PUT"
+    });
 }
 
 /**

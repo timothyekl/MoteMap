@@ -83,7 +83,11 @@ class MoteMap
   end
 
   put '/api/node/:nid/metadata' do
-    p params
+    md = Metadata.first_or_create(:id => params[:nid].to_i)
+    md.x = params[:x].to_i if !params[:x].nil?
+    md.y = params[:y].to_i if !params[:y].nil?
+    return {}.to_json if md.save
+    return {:error => "Failed to save metadata for node #{params[:nid]}"}
   end
 
 end
