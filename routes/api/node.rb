@@ -82,4 +82,8 @@ class MoteMap
     return node_list.to_h {|nid| node_metadata(nid, params[:field])}.to_json
   end
 
+  put '/api/node/:nid/metadata' do
+    p params
+  end
+
 end

@@ -23,30 +23,38 @@ function nodeDivHTML(nodeid) {
 /**
  * Create a collection of node divs in the page, one for each node ID in the argument.
  */
-function createNodes(idList) {
-    $.each(idList, function(idx, elem) {
-        $("body").append(nodeDivHTML(elem));
-    });
+function createNodes() {
+    $.ajax("/api/nodes/data", {
+        dataType: "json",
+        error: function(jqxhr, textStatus, errorThrown) {
+            displayError("Failed to load node data (" + textStatus + ")");
+        },
+        success: function(data, textStatus, jqxhr) {
+            for(var nodeid in data) {
+                // Create the node's HTML representation
+                $("body").append(nodeDivHTML(nodeid));
 
-    $(".node").draggable();
+                // Make the node draggable
+                $(".node#node-" + nodeid).draggable({
+                    stop: function(event, ui) {
+                        setLastPosition(nodeid, event.pageX, event.pageY);
+                    }
+                });
 
-    $.each(idList, function(idx, elem) {
-        $.ajax("/api/node/" + elem + "/data", {
-            dataType: "json",
-            error: function(jqxhr, textStatus, errorThrown) {
-                displayError("Failed to get data for node " + elem + " (" + textStatus + ")");
-            },
-            success: function(data, textStatus, jqxhr) {
-                var temp = parseInt(data["temp"]);
-                var light = parseInt(data["light"]);
-                colorTemperatureFromADC(elem, temp);
-                colorLightFromADC(elem, light);
-                setTooltipFromTemperatureLightADC(elem, temp, light);
+                // Populate the visual data for the node
+                var nodedata = data[nodeid];
+                var temp = parseInt(nodedata["temp"]);
+                var light = parseInt(nodedata["light"]);
+                colorTemperatureFromADC(nodeid, temp);
+                colorLightFromADC(nodeid, light);
+                setTooltipFromTemperatureLightADC(nodeid, temp, light);
             }
-        });
+
+            // Update positions of nodes on screen
+            updatePositionsFromMetadata();
+        }
     });
 
-    updatePositionsFromMetadata();
 }
 
 /**
@@ -139,13 +147,5 @@ function setTooltipFromTemperatureLightADC(nodeid, temp_adc, light_adc) {
 
 // Ready!
 $(document).ready(function () {
-    $.ajax("/api/nodes", {
-        dataType: "json",
-        error: function(jqxhr, textStatus, errorThrown) {
-            displayError("Failed to fetch list of nodes (" + textStatus + ")");
-        },
-        success: function(data, textStatus, jqxhr) {
-            createNodes(data);
-        }
-    });
+    createNodes();
 });
