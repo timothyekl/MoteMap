@@ -10,5 +10,12 @@
     %link{:rel => "stylesheet", :type => "text/css", :href => "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/ui-lightness/jquery-ui.css"}
     %link{:rel => "stylesheet", :type => "text/css", :href => "/style.css"}
   %body
+    #control-panel
+      Update every
+      %input#update-interval{:type => "text", :value => "10", :size => "4"}
+      seconds
+      %hr
+      %input#show-outdated{:type => "checkbox", :checked => "true"}
+      Show outdated motes
     %img#bgimage{:src => "/background"}
-    %div#modal
+    #modal
