@@ -38,7 +38,8 @@ function createNodes() {
                 $(".node#node-" + nodeid).draggable({
                     stop: function(n) {
                         return function(event, ui) {
-                            setLastPosition(n, event.pageX, event.pageY);
+                            var e = $(".node#node-" + n);
+                            setLastPosition(n, e.css('left').replace("px", ""), e.css('top').replace("px", ""));
                         }
                     }(nodeid)
                 });
@@ -81,7 +82,7 @@ function updatePositionsFromMetadata() {
                     var xpos = parseInt(nodedata["x"]);
                     if(xpos != -1) {
                         var e = $(".node#node-" + nodeid).first();
-                        e.css("left", (xpos - e.offset().left) + "px");
+                        e.css("left", xpos + "px");
                     }
                 }
 
@@ -89,7 +90,7 @@ function updatePositionsFromMetadata() {
                     var ypos = parseInt(nodedata["y"]);
                     if(ypos != -1) {
                         var e = $(".node#node-" + nodeid).first();
-                        e.css("top", (ypos - e.offset().top) + "px");
+                        e.css("top", ypos + "px");
                     }
                 }
             }
