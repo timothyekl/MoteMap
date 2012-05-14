@@ -53,8 +53,10 @@ function updateNodes(create) {
                 var nodedata = data[nodeid];
                 var temp = parseInt(nodedata["temp"]);
                 var light = parseInt(nodedata["light"]);
+                var ts = Date.parse(nodedata["result_time"]);
                 colorTemperatureFromADC(nodeid, temp);
                 colorLightFromADC(nodeid, light);
+                colorBorderFromTimestamp(nodeid, ts);
                 setTooltipFromTemperatureLightADC(nodeid, temp, light);
             }
 
@@ -158,6 +160,23 @@ function colorTemperatureFromADC(nodeid, adc) {
 function colorLightFromADC(nodeid, adc) {
     var lightColor = zero_pad((Math.floor((adc / 1023) * 255)).toString(16), 2);
     $(".node#node-" + nodeid + " .light").css("background-color", "#" + lightColor + lightColor + "00");
+}
+
+/**
+ * Color the border of the node with the given ID for the given timestamp of the most recent result.
+ *
+ * Timestamp values are interpreted linearly from now (black) to 30 minutes ago (red).
+ */
+function colorBorderFromTimestamp(nodeid, timestamp) {
+    var tdiff = Date.now() - timestamp;
+    var maxdiff = 30 * 60 * 1000;
+    var htmlColor;
+    if(tdiff > maxdiff) {
+        htmlColor = "#ff0000";
+    } else {
+        htmlColor = "#" + zero_pad((Math.floor((tdiff / maxdiff) * 255)).toString(16), 2) + "0000";
+    }
+    $(".node#node-" + nodeid).css("border", "2px solid " + htmlColor);
 }
 
 /**
