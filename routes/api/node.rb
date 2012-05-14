@@ -43,6 +43,7 @@ class MoteMap
     md = Metadata.first_or_create(:id => params[:nid].to_i)
     md.x = params[:x].to_i if !params[:x].nil?
     md.y = params[:y].to_i if !params[:y].nil?
+    md.visible = (params[:visible].to_i == 0 ? false : true) if !params[:visible].nil?
     return {}.to_json if md.save
     return {:error => "Failed to save metadata for node #{params[:nid]}"}
   end

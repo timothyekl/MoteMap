@@ -38,7 +38,7 @@ class MoteMap
         return {:error => "Metadata does not store field: #{field}"}
       end
 
-      params = [:x, :y]
+      params = [:x, :y, :visible]
       return params.to_h {|s| res.send(s)}
     end
 
