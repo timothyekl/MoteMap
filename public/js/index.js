@@ -1,3 +1,6 @@
+_TMP_REFRESH_RATE = 10000; // refresh every 10 seconds. TODO parameterize this somehow
+var REFRESH_TIMER_ID;
+
 /**
  * Show a dialog box with with the given error text
  */
@@ -23,7 +26,7 @@ function nodeDivHTML(nodeid) {
 /**
  * Create a collection of node divs in the page, one for each node ID in the argument.
  */
-function createNodes() {
+function updateNodes(create) {
     $.ajax("/api/nodes/data", {
         dataType: "json",
         error: function(jqxhr, textStatus, errorThrown) {
@@ -31,18 +34,20 @@ function createNodes() {
         },
         success: function(data, textStatus, jqxhr) {
             for(var nodeid in data) {
-                // Create the node's HTML representation
-                $("body").append(nodeDivHTML(nodeid));
+                if(create) {
+                    // Create the node's HTML representation
+                    $("body").append(nodeDivHTML(nodeid));
 
-                // Make the node draggable
-                $(".node#node-" + nodeid).draggable({
-                    stop: function(n) {
-                        return function(event, ui) {
-                            var e = $(".node#node-" + n);
-                            setLastPosition(n, e.css('left').replace("px", ""), e.css('top').replace("px", ""));
-                        }
-                    }(nodeid)
-                });
+                    // Make the node draggable
+                    $(".node#node-" + nodeid).draggable({
+                        stop: function(n) {
+                            return function(event, ui) {
+                                var e = $(".node#node-" + n);
+                                setLastPosition(n, e.css('left').replace("px", ""), e.css('top').replace("px", ""));
+                            }
+                        }(nodeid)
+                    });
+                }
 
                 // Populate the visual data for the node
                 var nodedata = data[nodeid];
@@ -54,7 +59,9 @@ function createNodes() {
             }
 
             // Update positions of nodes on screen
-            updatePositionsFromMetadata();
+            if(create) {
+                updatePositionsFromMetadata();
+            }
         }
     });
 
@@ -164,5 +171,6 @@ function setTooltipFromTemperatureLightADC(nodeid, temp_adc, light_adc) {
 
 // Ready!
 $(document).ready(function () {
-    createNodes();
+    updateNodes(true);
+    REFRESH_TIMER_ID = setInterval('updateNodes(false);', _TMP_REFRESH_RATE);
 });
