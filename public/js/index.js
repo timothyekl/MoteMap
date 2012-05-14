@@ -47,6 +47,25 @@ function updateNodes(create) {
                             }
                         }(nodeid)
                     });
+
+                    // Add the node to the toggleable list
+                    $("#control-panel").append("<br /><input type='checkbox' checked='checked' id='checkbox-" + nodeid + "'/> " + nodeid);
+
+                    // Register the new toggling checkbox to the node's visibility
+                    $("#checkbox-" + nodeid).click(function(n) {
+                        return function(event) {
+                            var e = $(".node#node-" + n);
+                            var c = $("#checkbox-" + n);
+
+                            if(c.prop("checked")) {
+                                e.css("display", "block");
+                            } else {
+                                e.css("display", "none");
+                            }
+
+                            setLastPosition(n, undefined, undefined, c.prop("checked") ? 1 : 0);
+                        }
+                    }(nodeid));
                 }
 
                 // Populate the visual data for the node
@@ -87,6 +106,18 @@ function updatePositionsFromMetadata() {
             
             for(var nodeid in data) {
                 nodedata = data[nodeid];
+
+                if(typeof(nodedata["visible"] != "undefined")) {
+                    var visible = nodedata["visible"];
+                    if(visible) {
+                        $("#checkbox-" + nodeid).prop("checked", true);
+                        $(".node#node-" + nodeid).css("display", "block");
+                    } else {
+                        $("#checkbox-" + nodeid).prop("checked", false);
+                        $(".node#node-" + nodeid).css("display", "none");
+                    }
+                }
+
                 if(typeof(nodedata["x"]) != "undefined") {
                     var xpos = parseInt(nodedata["x"]);
                     if(xpos != -1) {
@@ -110,9 +141,15 @@ function updatePositionsFromMetadata() {
 /**
  * Set the last known position of the given node in server metadata.
  */
-function setLastPosition(nodeid, x, y) {
+function setLastPosition(nodeid, x, y, visible) {
+    data = {};
+
+    if(typeof(x) != "undefined") { data.x = x };
+    if(typeof(y) != "undefined") { data.y = y };
+    if(typeof(visible) != "undefined") { data.visible = visible };
+
     $.ajax("/api/node/" + nodeid + "/metadata", {
-        data: {x: x, y: y},
+        data: data,
         dataType: "json",
         error: function(jqxhr, textStatus, errorThrown) {
             displayError("Could not set metadata for node " + nodeid + " (" + textStatus + ")");
