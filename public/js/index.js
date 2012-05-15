@@ -181,7 +181,7 @@ function colorTemperatureFromADC(nodeid, adc) {
         var color = zero_pad((Math.floor((temp / 25) * 255)).toString(16), 2);
         tempString = "#" + color + color + "ff";
     } else if (temp < 50) {
-        var color = zero_pad((Math.floor(((temp - 25) / 25) * 255)).toString(16), 2);
+        var color = zero_pad((Math.floor(-1 * ((temp - 50) / 25) * 255)).toString(16), 2);
         tempString = "#ff" + color + color;
     } else {
         tempString = "#ff0000";
