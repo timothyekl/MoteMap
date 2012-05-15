@@ -1,4 +1,4 @@
-_TMP_REFRESH_RATE = 10000; // refresh every 10 seconds. TODO parameterize this somehow
+REFRESH_RATE = 10000; // refresh every 10 seconds. TODO parameterize this somehow
 var REFRESH_TIMER_ID;
 
 /**
@@ -228,5 +228,12 @@ function setTooltipFromTemperatureLightADC(nodeid, temp_adc, light_adc) {
 // Ready!
 $(document).ready(function () {
     updateNodes(true);
-    REFRESH_TIMER_ID = setInterval('updateNodes(false);', _TMP_REFRESH_RATE);
+
+    // Set up timer for node refresh
+    REFRESH_TIMER_ID = setInterval('updateNodes(false);', REFRESH_RATE);
+    $("#update-interval").change(function(event) {
+        clearInterval(REFRESH_TIMER_ID);
+        REFRESH_RATE = parseInt($("#update-interval").val());
+        REFRESH_TIMER_ID = setInterval('updateNodes(false);', REFRESH_RATE);
+    });
 });
