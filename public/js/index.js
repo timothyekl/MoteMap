@@ -52,18 +52,9 @@ function updateNodes(create) {
                     $("#control-panel").append("<br /><input type='checkbox' checked='checked' id='checkbox-" + nodeid + "'/> " + nodeid);
 
                     // Register the new toggling checkbox to the node's visibility
-                    $("#checkbox-" + nodeid).click(function(n) {
+                    $("#checkbox-" + nodeid).change(function(n) {
                         return function(event) {
-                            var e = $(".node#node-" + n);
-                            var c = $("#checkbox-" + n);
-
-                            if(c.prop("checked")) {
-                                e.css("display", "block");
-                            } else {
-                                e.css("display", "none");
-                            }
-
-                            setLastPosition(n, undefined, undefined, c.prop("checked") ? 1 : 0);
+                            updateNodeVisibility(n, true);
                         }
                     }(nodeid));
                 }
@@ -86,6 +77,24 @@ function updateNodes(create) {
         }
     });
 
+}
+
+/**
+ * Force an update to the visibility of the given node.
+ */
+function updateNodeVisibility(nodeid, ajax) {
+    var e = $(".node#node-" + nodeid);
+    var c = $("#checkbox-" + nodeid);
+
+    if(c.prop("checked")) {
+        e.css("display", "block");
+    } else {
+        e.css("display", "none");
+    }
+
+    if(ajax) {
+        setLastPosition(n, undefined, undefined, c.prop("checked") ? 1 : 0);
+    }
 }
 
 /**
@@ -235,5 +244,17 @@ $(document).ready(function () {
         clearInterval(REFRESH_TIMER_ID);
         REFRESH_RATE = parseInt($("#update-interval").val());
         REFRESH_TIMER_ID = setInterval('updateNodes(false);', REFRESH_RATE);
+    });
+
+    // Bind action for "show outdated motes" checkbox
+    $("#show-outdated").change(function(event) {
+        $(".node").each(function(idx, elem) {
+            var bordercolor = $(elem).css("border").split(" ").slice(2,5).join(" ").replace(";", "");
+            var nodeid = parseInt($(elem).prop("id").replace("node-", ""));
+            if(bordercolor == "rgb(255, 0, 0)") {
+                $("#checkbox-" + nodeid).prop("checked", $("#show-outdated").prop("checked"));
+                updateNodeVisibility(nodeid, false);
+            }
+        });
     });
 });
